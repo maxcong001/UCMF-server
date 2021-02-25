@@ -1,0 +1,861 @@
+openapi: 3.0.0
+info:
+  description: |
+    Nucmf_UECapabilityManagement Service.
+    © 2020, 3GPP Organizational Partners (ARIB, ATIS, CCSA, ETSI, TSDSI, TTA, TTC).
+    All rights reserved.
+  title: Nucmf_UECapabilityManagement
+  version: 1.0.2
+externalDocs:
+  description: 3GPP TS 29.673 V16.3.0; 5G System; UE Radio Capability Management Services
+  url: http://www.3gpp.org/ftp/Specs/archive/29_series/29.673/
+servers:
+- url: '{apiRoot}/nucmf-uecm/v1'
+  variables:
+    apiRoot:
+      default: https://example.com
+      description: apiRoot as defined in clause 4.4 of 3GPP TS 29.501
+security:
+- {}
+- oAuth2ClientCredentials:
+  - nucmf-uecm
+paths:
+  /dic-entries:
+    get:
+      operationId: RetrieveDictionaryEntry
+      parameters:
+      - description: UE Radio Capability ID, either PLMN Assigned or Manufacturer
+          Assigned
+        explode: true
+        in: query
+        name: ue-radio-capa-id
+        required: true
+        schema:
+          $ref: '#/components/schemas/UeRadioCapaId'
+        style: form
+      - description: Encoding format of RAC Info
+        explode: true
+        in: query
+        name: rac-format
+        required: false
+        schema:
+          $ref: '#/components/schemas/RacFormat'
+        style: form
+      responses:
+        "200":
+          content:
+            multipart/related:
+              encoding:
+                jsonData:
+                  contentType: application/json
+                  style: form
+                binaryDataUeRadioCapability5GS:
+                  contentType: application/vnd.3gpp.ngap
+                  headers:
+                    Content-Id:
+                      explode: false
+                      schema:
+                        type: string
+                      style: simple
+                  style: form
+                binaryDataUeRadioCapabilityEPS:
+                  contentType: application/vnd.3gpp.s1ap
+                  headers:
+                    Content-Id:
+                      explode: false
+                      schema:
+                        type: string
+                      style: simple
+                  style: form
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+          description: Expected response to a valid request
+        "400":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Bad request
+        "401":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Unauthorized
+        "403":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Forbidden
+        "404":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Not Found
+        "406":
+          description: 406 Not Acceptable
+        "411":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Length Required
+        "413":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Payload Too Large
+        "415":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Unsupported Media Type
+        "429":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Too Many Requests
+        "500":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Internal Server Error
+        "501":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Not Implemented
+        "503":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Service Unavailable
+        default:
+          description: Generic Error
+      summary: retrieve a dictionary entry matching query parameters
+      tags:
+      - Dictionary Entry (Store)
+    post:
+      operationId: CreateDictionaryEntry
+      requestBody:
+        $ref: '#/components/requestBodies/inline_object'
+        content:
+          multipart/related:
+            encoding:
+              jsonData:
+                contentType: application/json
+                style: form
+              binaryDataUeRadioCapability5GS:
+                contentType: application/vnd.3gpp.ngap
+                headers:
+                  Content-Id:
+                    explode: false
+                    schema:
+                      type: string
+                    style: simple
+                style: form
+              binaryDataUeRadioCapabilityEPS:
+                contentType: application/vnd.3gpp.s1ap
+                headers:
+                  Content-Id:
+                    explode: false
+                    schema:
+                      type: string
+                    style: simple
+                style: form
+            schema:
+              properties:
+                jsonData:
+                  $ref: '#/components/schemas/DicEntryCreateData'
+                binaryDataUeRadioCapability5GS:
+                  format: binary
+                  type: string
+                binaryDataUeRadioCapabilityEPS:
+                  format: binary
+                  type: string
+              type: object
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DicEntryCreatedData'
+          description: Dictionary Created
+          headers:
+            Location:
+              description: 'Contains the URI of the newly created resource, according
+                to the structure: {apiRoot}/nucmf-uecm/<apiVersion>/dic-entries/{dicEntryId}'
+              explode: false
+              required: true
+              schema:
+                type: string
+              style: simple
+        "400":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Bad request
+        "403":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Forbidden
+        "411":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Length Required
+        "413":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Payload Too Large
+        "415":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Unsupported Media Type
+        "429":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Too Many Requests
+        "500":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Internal Server Error
+        "501":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Not Implemented
+        "503":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Service Unavailable
+        default:
+          description: Generic Error
+      summary: Create a dictionary entry in the UCMF
+      tags:
+      - a dictionary entry (Document)
+  /dic-entries/{dicEntryId}:
+    get:
+      operationId: GetDicEntry
+      parameters:
+      - description: the ID of a dictionary entry in the UCMF
+        explode: false
+        in: path
+        name: dicEntryId
+        required: true
+        schema:
+          $ref: '#/components/schemas/DicEntryId'
+        style: simple
+      - description: Encoding format of of RAC Info
+        explode: true
+        in: query
+        name: rac-format
+        required: false
+        schema:
+          $ref: '#/components/schemas/RacFormat'
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DicEntryData'
+          description: Expected response to a valid request
+        "400":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Bad request
+        "401":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Unauthorized
+        "403":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Forbidden
+        "404":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Not Found
+        "406":
+          description: 406 Not Acceptable
+        "411":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Length Required
+        "413":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Payload Too Large
+        "415":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Unsupported Media Type
+        "429":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Too Many Requests
+        "500":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Internal Server Error
+        "501":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Not Implemented
+        "503":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Service Unavailable
+        default:
+          description: Generic Error
+      summary: Get an individual dictionary entry via dicEntryId
+      tags:
+      - dic Entry Id (Document)
+  /subscriptions:
+    post:
+      callbacks:
+        myNotification:
+          '{$request.body#/ucmfNotificationUri}':
+            post:
+              operationId: myNotification_Post
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/UcmfNotification'
+                required: true
+              responses:
+                "204":
+                  description: No Content, Notification was succesfull
+                "400":
+                  content:
+                    application/problem+json:
+                      schema:
+                        $ref: '#/components/schemas/ProblemDetails'
+                  description: Bad request
+                "401":
+                  content:
+                    application/problem+json:
+                      schema:
+                        $ref: '#/components/schemas/ProblemDetails'
+                  description: Unauthorized
+                "403":
+                  content:
+                    application/problem+json:
+                      schema:
+                        $ref: '#/components/schemas/ProblemDetails'
+                  description: Forbidden
+                "404":
+                  content:
+                    application/problem+json:
+                      schema:
+                        $ref: '#/components/schemas/ProblemDetails'
+                  description: Not Found
+                "411":
+                  content:
+                    application/problem+json:
+                      schema:
+                        $ref: '#/components/schemas/ProblemDetails'
+                  description: Length Required
+                "413":
+                  content:
+                    application/problem+json:
+                      schema:
+                        $ref: '#/components/schemas/ProblemDetails'
+                  description: Payload Too Large
+                "415":
+                  content:
+                    application/problem+json:
+                      schema:
+                        $ref: '#/components/schemas/ProblemDetails'
+                  description: Unsupported Media Type
+                "429":
+                  content:
+                    application/problem+json:
+                      schema:
+                        $ref: '#/components/schemas/ProblemDetails'
+                  description: Too Many Requests
+                "500":
+                  content:
+                    application/problem+json:
+                      schema:
+                        $ref: '#/components/schemas/ProblemDetails'
+                  description: Internal Server Error
+                "503":
+                  content:
+                    application/problem+json:
+                      schema:
+                        $ref: '#/components/schemas/ProblemDetails'
+                  description: Service Unavailable
+                default:
+                  description: Generic Error
+              x-callback-request: true
+      operationId: CreateIndividualSubcription
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSubscription'
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatedSubscription'
+          description: Success
+          headers:
+            Location:
+              description: 'Contains the URI of the newly created resource, according
+                to the structure: {apiRoot}/nucmf-uecm/<apiVersion>/subscriptions/{subscriptionId}'
+              explode: false
+              required: true
+              schema:
+                type: string
+              style: simple
+        "400":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Bad request
+        "401":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Unauthorized
+        "403":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Forbidden
+        "404":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Not Found
+        "411":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Length Required
+        "413":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Payload Too Large
+        "415":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Unsupported Media Type
+        "429":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Too Many Requests
+        "500":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Internal Server Error
+        "503":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Service Unavailable
+        default:
+          description: Generic Error
+      summary: Nucmf_UECapabilityManagement Subscribe service Operation
+      tags:
+      - Subscriptions (Collection)
+  /subscriptions/{subscriptionId}:
+    delete:
+      operationId: DeleteIndividualSubcription
+      parameters:
+      - description: Event Subscription ID
+        explode: false
+        in: path
+        name: subscriptionId
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "204":
+          description: No Content. Resource was succesfully deleted
+        "400":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Bad request
+        "401":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Unauthorized
+        "403":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Forbidden
+        "404":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Not Found
+        "429":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Too Many Requests
+        "500":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Internal Server Error
+        "503":
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Service Unavailable
+        default:
+          description: Generic Error
+      summary: unsubscribe from notifications
+      tags:
+      - IndividualSubscription (Document)
+components:
+  requestBodies:
+    inline_object:
+      content:
+        multipart/related:
+          schema:
+            $ref: '#/components/schemas/inline_object'
+      required: true
+  schemas:
+    DicEntryData:
+      example:
+        ueRadioCapability5GS:
+          contentId: contentId
+        ueRadioCapabilityEPS:
+          contentId: contentId
+        typeAllocationCode: typeAllocationCode
+        manAssiUeRadioCapId: manAssiUeRadioCapId
+        dicEntryId: 343953088
+        plmnAssiUeRadioCapId: plmnAssiUeRadioCapId
+      properties:
+        dicEntryId:
+          maximum: 4294967295
+          minimum: 0
+          type: integer
+        typeAllocationCode:
+          pattern: ^[0-9]{8}$
+          type: string
+        plmnAssiUeRadioCapId:
+          format: byte
+          type: string
+        manAssiUeRadioCapId:
+          format: byte
+          type: string
+        ueRadioCapability5GS:
+          $ref: '#/components/schemas/RefToBinaryData'
+        ueRadioCapabilityEPS:
+          $ref: '#/components/schemas/RefToBinaryData'
+      required:
+      - typeAllocationCode
+      type: object
+    DicEntryCreateData:
+      properties:
+        typeAllocationCode:
+          pattern: ^[0-9]{8}$
+          type: string
+        ueRadioCapability5GS:
+          $ref: '#/components/schemas/RefToBinaryData'
+        ueRadioCapabilityEPS:
+          $ref: '#/components/schemas/RefToBinaryData'
+      required:
+      - typeAllocationCode
+      type: object
+    DicEntryCreatedData:
+      example:
+        plmnAssiUeRadioCapId: plmnAssiUeRadioCapId
+      properties:
+        plmnAssiUeRadioCapId:
+          format: byte
+          type: string
+      required:
+      - plmnAssiUeRadioCapId
+      type: object
+    UeRadioCapaId:
+      properties:
+        plmnAssiUeRadioCapId:
+          format: byte
+          type: string
+        manAssiUeRadioCapId:
+          format: byte
+          type: string
+      type: object
+    CreateSubscription:
+      example:
+        nfId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        suggestedExpires: 2000-01-23T04:56:07.000+00:00
+        ucmfNotificationUri: ucmfNotificationUri
+      properties:
+        nfId:
+          format: uuid
+          type: string
+        ucmfNotificationUri:
+          type: string
+        suggestedExpires:
+          format: date-time
+          type: string
+      required:
+      - ucmfNotificationUri
+      type: object
+    CreatedSubscription:
+      example:
+        dicEntryId: 343953088
+        confirmedExpires: 2000-01-23T04:56:07.000+00:00
+      properties:
+        dicEntryId:
+          maximum: 4294967295
+          minimum: 0
+          type: integer
+        confirmedExpires:
+          format: date-time
+          type: string
+      required:
+      - dicEntryId
+      type: object
+    UcmfNotification:
+      example:
+        manAssOpRequestlist:
+          typeAllocationCode:
+          - null
+          - null
+          plmnAssiUeRadioCapId:
+          - null
+          - null
+        versionId: 0
+        dicEntryId: 343953088
+      properties:
+        dicEntryId:
+          maximum: 4294967295
+          minimum: 0
+          type: integer
+        eventType:
+          $ref: '#/components/schemas/EventType'
+        manAssOpRequestlist:
+          $ref: '#/components/schemas/manAssOpRequestlist'
+        versionId:
+          minimum: 0
+          type: integer
+      required:
+      - dicEntryId
+      - eventType
+      type: object
+    manAssOpRequestlist:
+      example:
+        typeAllocationCode:
+        - null
+        - null
+        plmnAssiUeRadioCapId:
+        - null
+        - null
+      oneOf:
+      - required:
+        - plmnAssiUeRadioCapId
+      - required:
+        - typeAllocationCod
+      properties:
+        plmnAssiUeRadioCapId:
+          items:
+            $ref: '#/components/schemas/PlmnAssiUeRadioCapId'
+          minItems: 1
+          type: array
+        typeAllocationCode:
+          items:
+            $ref: '#/components/schemas/TypeAllocationCode'
+          type: array
+      type: object
+    DicEntryId:
+      maximum: 4294967295
+      minimum: 0
+      type: integer
+    EventType:
+      anyOf:
+      - $ref: '#/components/schemas/EventType_anyOf'
+      - type: string
+    RacFormat:
+      anyOf:
+      - $ref: '#/components/schemas/RacFormat_anyOf'
+      - type: string
+    ProblemDetails:
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+        cause:
+          type: string
+        invalidParams:
+          items:
+            $ref: '#/components/schemas/InvalidParam'
+          minItems: 1
+          type: array
+        supportedFeatures:
+          pattern: ^[A-Fa-f0-9]*$
+          type: string
+      type: object
+    Uri:
+      type: string
+    InvalidParam:
+      properties:
+        param:
+          type: string
+        reason:
+          type: string
+      required:
+      - param
+      type: object
+    SupportedFeatures:
+      pattern: ^[A-Fa-f0-9]*$
+      type: string
+    TypeAllocationCode:
+      pattern: ^[0-9]{8}$
+      type: string
+    PlmnAssiUeRadioCapId:
+      $ref: '#/components/schemas/Bytes'
+    Bytes:
+      format: byte
+      type: string
+    ManAssiUeRadioCapId:
+      $ref: '#/components/schemas/Bytes'
+    RefToBinaryData:
+      example:
+        contentId: contentId
+      properties:
+        contentId:
+          type: string
+      required:
+      - contentId
+      type: object
+    NfInstanceId:
+      format: uuid
+      type: string
+    DateTime:
+      format: date-time
+      type: string
+    Uinteger:
+      minimum: 0
+      type: integer
+    inline_response_200:
+      properties:
+        jsonData:
+          $ref: '#/components/schemas/DicEntryData'
+        binaryDataUeRadioCapability5GS:
+          format: binary
+          type: string
+        binaryDataUeRadioCapabilityEPS:
+          format: binary
+          type: string
+      type: object
+    inline_object:
+      properties:
+        jsonData:
+          $ref: '#/components/schemas/DicEntryCreateData'
+        binaryDataUeRadioCapability5GS:
+          format: binary
+          type: string
+        binaryDataUeRadioCapabilityEPS:
+          format: binary
+          type: string
+      type: object
+    EventType_anyOf:
+      enum:
+      - CREATION_OF_DICTIONARY_ENTRY
+      - DELETION_OF_PLMN_ASSIGNED_IDS
+      - NEW_VERSION_ID_OF_PLMN_ASSIGNED_IDs
+      type: string
+    RacFormat_anyOf:
+      enum:
+      - 5GS
+      - EPS
+      type: string
+  securitySchemes:
+    oAuth2ClientCredentials:
+      flows:
+        clientCredentials:
+          scopes:
+            nucmf-uecm: Access to the Nucmf_UECapabilityManagement API
+          tokenUrl: '{nrfApiRoot}/oauth2/token'
+      type: oauth2
