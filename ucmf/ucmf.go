@@ -6,8 +6,8 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 
-	"UCMF-SERVER/UCMFClient/"
-	"UCMF-SERVER/UCMFServer/"
+	"ucmf/lib/logger"
+	"ucmf/lib/version"
 )
 
 var UDR = &udr_service.UDR{}
@@ -20,9 +20,9 @@ func init() {
 
 func main() {
 	app := cli.NewApp()
-	app.Name = "udr"
+	app.Name = "ucmf"
 	appLog.Infoln(app.Name)
-	appLog.Infoln("UDR version: ", version.GetVersion())
+	appLog.Infoln("UCMF version: ", version.GetVersion())
 	app.Usage = "-free5gccfg common configuration file -udrcfg udr configuration file"
 	app.Action = action
 	app.Flags = UDR.GetCliCmd()
