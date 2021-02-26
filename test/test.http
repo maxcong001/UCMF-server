@@ -1,3 +1,7 @@
-GET http://localhost:8080/nucmf-uecm/v1/dic-entries?ue-radio-capa-id={"plmnAssiUeRadioCapId":"test", "manAssiUeRadioCapId":"test"} HTTP/1.1
+GET http://127.0.0.1:8080/nucmf-uecm/v1/dic-entries?ue-radio-capa-id={"plmnAssiUeRadioCapId":"test", "manAssiUeRadioCapId":"test"} HTTP/1.1
 content-type: application/json
 
+###
+
+GET http://127.0.0.1:8080/nucmf-uecm/v1/dic-entries/124 HTTP/1.1
+content-type: application/json
